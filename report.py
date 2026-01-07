@@ -1,0 +1,149 @@
+from reportlab.lib.pagesizes import letter, A4
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.lib.units import inch
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
+from reportlab.lib import colors
+from openpyxl import Workbook
+from openpyxl.styles import Font, PatternFill
+from datetime import datetime
+
+class ReportGenerator:
+    """Génère les rapports (PDF, Excel)"""
+
+    def __init__(self, data):
+        self.data = data
+        self.timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+
+    def generate_pdf(self, filename=None):
+        """Génère un PDF du rapport"""
+        if not filename:
+            filename = f"audit_it_{self.timestamp}.pdf"
+
+        doc = SimpleDocTemplate(filename, pagesize=A4)
+        elements = []
+        styles = getSampleStyleSheet()
+
+        # Titre
+        title_style = ParagraphStyle(
+            "CustomTitle",
+            parent=styles["Heading1"],
+            fontSize=24,
+            textColor=colors.HexColor("#1F2121"),
+            spaceAfter=30,
+        )
+        elements.append(Paragraph("Audit Informatique", title_style))
+        elements.append(Spacer(1, 0.3 * inch))
+
+        # Infos de base
+        basic = self.data.get("basic", {})
+        elements.append(Paragraph(f"<b>Poste :</b> {basic.get('hostname')}", styles["Normal"]))
+        elements.append(Paragraph(f"<b>OS :</b> {basic.get('os')} {basic.get('os_version')}", styles["Normal"]))
+        elements.append(Paragraph(f"<b>Date du scan :</b> {basic.get('scan_date')}", styles["Normal"]))
+        elements.append(Spacer(1, 0.2 * inch))
+
+        # CPU
+        cpu = self.data.get("cpu", {})
+        elements.append(Paragraph("<b>Processeur</b>", styles["Heading2"]))
+        elements.append(Paragraph(f"Cœurs physiques: {cpu.get('cpu_count_physical')}", styles["Normal"]))
+        elements.append(Paragraph(f"Cœurs logiques: {cpu.get('cpu_count_logical')}", styles["Normal"]))
+        elements.append(Paragraph(f"Fréquence: {cpu.get('cpu_freq_mhz')} MHz", styles["Normal"]))
+        elements.append(Spacer(1, 0.2 * inch))
+
+        # Mémoire
+        mem = self.data.get("memory", {})
+        elements.append(Paragraph("<b>Mémoire</b>", styles["Heading2"]))
+        elements.append(Paragraph(f"Total: {mem.get('memory_total_gb')} GB", styles["Normal"]))
+        elements.append(Paragraph(f"Utilisée: {mem.get('memory_used_gb')} GB ({mem.get('memory_percent')}%)", styles["Normal"]))
+        elements.append(Spacer(1, 0.2 * inch))
+
+        # Disques
+        disks = self.data.get("disk", [])
+        if disks:
+            elements.append(Paragraph("<b>Disques</b>", styles["Heading2"]))
+            disk_data = [["Disque", "Total (GB)", "Utilisé (GB)", "% Utilisé"]]
+            for disk in disks:
+                disk_data.append([
+                    disk["device"],
+                    str(disk["total_gb"]),
+                    str(disk["used_gb"]),
+                    str(disk["percent"]) + "%",
+                ])
+            table = Table(disk_data)
+            table.setStyle(TableStyle([
+                ("BACKGROUND", (0, 0), (-1, 0), colors.grey),
+                ("TEXTCOLOR", (0, 0), (-1, 0), colors.whitesmoke),
+                ("ALIGN", (0, 0), (-1, -1), "CENTER"),
+                ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
+                ("FONTSIZE", (0, 0), (-1, 0), 12),
+                ("BOTTOMPADDING", (0, 0), (-1, 0), 12),
+                ("BACKGROUND", (0, 1), (-1, -1), colors.beige),
+                ("GRID", (0, 0), (-1, -1), 1, colors.black),
+            ]))
+            elements.append(table)
+
+        doc.build(elements)
+        print(f"✓ PDF généré: {filename}")
+        return filename
+
+    def generate_excel(self, filename=None):
+        """Génère un Excel du rapport"""
+        if not filename:
+            filename = f"audit_it_{self.timestamp}.xlsx"
+
+        wb = Workbook()
+        ws = wb.active
+        ws.title = "Audit IT"
+
+        # Header
+        header_fill = PatternFill(start_color="1F2121", end_color="1F2121", fill_type="solid")
+        header_font = Font(bold=True, color="FFFFFF")
+
+        ws["A1"] = "AUDIT INFORMATIQUE"
+        ws["A1"].font = Font(bold=True, size=14)
+
+        # Infos de base
+        basic = self.data.get("basic", {})
+        row = 3
+        ws[f"A{row}"] = "Poste"
+        ws[f"B{row}"] = basic.get("hostname")
+        row += 1
+        ws[f"A{row}"] = "OS"
+        ws[f"B{row}"] = f"{basic.get('os')} {basic.get('os_version')}"
+        row += 1
+        ws[f"A{row}"] = "Date du scan"
+        ws[f"B{row}"] = basic.get("scan_date")
+        row += 2
+
+        # CPU
+        cpu = self.data.get("cpu", {})
+        ws[f"A{row}"] = "PROCESSEUR"
+        ws[f"A{row}"].font = Font(bold=True)
+        row += 1
+        ws[f"A{row}"] = "Cœurs physiques"
+        ws[f"B{row}"] = cpu.get("cpu_count_physical")
+        row += 1
+        ws[f"A{row}"] = "Cœurs logiques"
+        ws[f"B{row}"] = cpu.get("cpu_count_logical")
+        row += 2
+
+        # Mémoire
+        mem = self.data.get("memory", {})
+        ws[f"A{row}"] = "MÉMOIRE"
+        ws[f"A{row}"].font = Font(bold=True)
+        row += 1
+        ws[f"A{row}"] = "Total (GB)"
+        ws[f"B{row}"] = mem.get("memory_total_gb")
+        row += 1
+        ws[f"A{row}"] = "Utilisée (GB)"
+        ws[f"B{row}"] = mem.get("memory_used_gb")
+        row += 1
+        ws[f"A{row}"] = "% Utilisé"
+        ws[f"B{row}"] = mem.get("memory_percent")
+
+        # Auto-adjust columns
+        ws.column_dimensions["A"].width = 25
+        ws.column_dimensions["B"].width = 25
+
+        wb.save(filename)
+        print(f"✓ Excel généré: {filename}")
+        return filename
