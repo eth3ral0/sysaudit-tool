@@ -1,6 +1,7 @@
 import psutil
 import platform
 import socket
+import subprocess
 from datetime import datetime
 
 class SystemCollector:
@@ -68,21 +69,9 @@ class SystemCollector:
         return networks
 
     def get_installed_software(self):
-        """Liste des logiciels installés (Windows)"""
-        import subprocess
-        try:
-            # Recupere la liste des programmes via PowerShell
-            result = subprocess.run(
-                ["powershell", "-Command",
-                 "Get-ItemProperty HKLM:\\Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\* | Select DisplayName, DisplayVersion | ConvertTo-Json"],
-                capture_output=True,
-                text=True,
-                timeout=10,
-            )
-            # Tres simplifie pour eviter les erreurs JSON complexes
-            return "Software list retrieved (voir rapport détaillé)"
-        except Exception as e:
-            return f"Erreur: {str(e)}"
+        """Placeholder pour logiciels installes"""
+        return "Liste des logiciels : fonctionnalite a venir"
+
 
     def collect_all(self):
         """Collecte toutes les infos"""
