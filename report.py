@@ -6,6 +6,7 @@ from reportlab.lib import colors
 from openpyxl import Workbook
 from openpyxl.styles import Font, PatternFill
 from datetime import datetime
+import os 
 
 class ReportGenerator:
     """Génère les rapports (PDF, Excel)"""
@@ -13,13 +14,16 @@ class ReportGenerator:
     def __init__(self, data):
         self.data = data
         self.timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        self.output_dir = "reports"
+        os.makedirs(self.output_dir, exist_ok=True)
 
     def generate_pdf(self, filename=None):
         """Génère un PDF du rapport"""
         if not filename:
             filename = f"audit_it_{self.timestamp}.pdf"
+        filepath = os.path.join(self.output_dir, filename)
 
-        doc = SimpleDocTemplate(filename, pagesize=A4)
+        doc = SimpleDocTemplate(filepath, pagesize=A4)
         elements = []
         styles = getSampleStyleSheet()
 
@@ -82,13 +86,14 @@ class ReportGenerator:
             elements.append(table)
 
         doc.build(elements)
-        print(f"✓ PDF généré: {filename}")
-        return filename
+        print(f"✓ PDF généré: {filepath}")
+        return filepath
 
     def generate_excel(self, filename=None):
         """Génère un Excel du rapport"""
         if not filename:
             filename = f"audit_it_{self.timestamp}.xlsx"
+        filepath = os.path.join(self.output_dir, filename)
 
         wb = Workbook()
         ws = wb.active
@@ -144,6 +149,6 @@ class ReportGenerator:
         ws.column_dimensions["A"].width = 25
         ws.column_dimensions["B"].width = 25
 
-        wb.save(filename)
-        print(f"✓ Excel généré: {filename}")
-        return filename
+        wb.save(filepath)
+        print(f"✓ Excel généré: {filepath}")
+        return filepath

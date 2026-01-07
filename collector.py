@@ -71,7 +71,7 @@ class SystemCollector:
         """Liste des logiciels installés (Windows)"""
         import subprocess
         try:
-            # Récupère la liste des programmes via PowerShell
+            # Recupere la liste des programmes via PowerShell
             result = subprocess.run(
                 ["powershell", "-Command",
                  "Get-ItemProperty HKLM:\\Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\* | Select DisplayName, DisplayVersion | ConvertTo-Json"],
@@ -79,7 +79,7 @@ class SystemCollector:
                 text=True,
                 timeout=10,
             )
-            # Très simplifié pour éviter les erreurs JSON complexes
+            # Tres simplifie pour eviter les erreurs JSON complexes
             return "Software list retrieved (voir rapport détaillé)"
         except Exception as e:
             return f"Erreur: {str(e)}"
