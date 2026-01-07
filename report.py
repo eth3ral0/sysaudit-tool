@@ -84,6 +84,13 @@ class ReportGenerator:
                 ("GRID", (0, 0), (-1, -1), 1, colors.black),
             ]))
             elements.append(table)
+        
+        summary = self.data.get("health_summary", "")
+        if summary:
+            elements.append(Spacer(1, 0.2 * inch))
+            elements.append(Paragraph("<b>Synthese de l'etat du poste</b>", styles["Heading2"]))
+            elements.append(Paragraph(summary, styles["Normal"]))
+
 
         doc.build(elements)
         print(f"✓ PDF généré: {filepath}")
@@ -148,6 +155,14 @@ class ReportGenerator:
         # Auto-adjust columns
         ws.column_dimensions["A"].width = 25
         ws.column_dimensions["B"].width = 25
+        
+        # Santé du système (si disponible)
+        row += 2
+        ws[f"A{row}"] = "SYNTHESE ETAT DU POSTE"
+        ws[f"A{row}"].font = Font(bold=True)
+        row += 1
+        ws[f"A{row}"] = self.data.get("health_summary", "")
+
 
         wb.save(filepath)
         print(f"✓ Excel généré: {filepath}")

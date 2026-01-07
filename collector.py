@@ -1,7 +1,6 @@
 import psutil
 import platform
 import socket
-import subprocess
 from datetime import datetime
 
 class SystemCollector:
@@ -72,10 +71,21 @@ class SystemCollector:
         """Placeholder pour logiciels installes"""
         return "Liste des logiciels : fonctionnalite a venir"
 
+    def compute_health_summary(self, data):
+        """Analyse rapide de l'etat du poste"""
+        issues = []
+        mem = data.get("memory", {})
+        if mem and mem.get("memory_percent", 0) > 85:
+            issues.append("RAM fortement sollicitee (>85%).")
+        for d in data.get("disk", []):
+            if d.get("percent", 0) > 90:
+                issues.append(f"Disque {d.get('device')} presque plein (>90%).")
+        if not issues:
+            return "Aucun probleme majeur detecte."
+        return " / ".join(issues)
 
     def collect_all(self):
-        """Collecte toutes les infos"""
-        return {
+        data = {
             "basic": self.get_basic_info(),
             "cpu": self.get_cpu_info(),
             "memory": self.get_memory_info(),
@@ -83,3 +93,6 @@ class SystemCollector:
             "network": self.get_network_info(),
             "software": self.get_installed_software(),
         }
+        # ajouter la synthese de sante
+        data["health_summary"] = self.compute_health_summary(data)
+        return data

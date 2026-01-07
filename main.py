@@ -29,6 +29,7 @@ def main():
             hosts = scanner.scan_network()
             data["network_hosts"] = hosts
             logger.log("Scan reseau effectue sur {} ({} hote(s) UP)".format(network_range, len(hosts)))
+        
         # 3. Genere rapports
         print("Generation des rapports...")
         report_gen = ReportGenerator(data)
