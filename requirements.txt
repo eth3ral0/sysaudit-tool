@@ -1,4 +1,4 @@
-psutil==5.9.8
-ping3==4.0.4
-openpyxl==3.10.10
-reportlab==4.0.9
+psutil
+ping3
+openpyxl
+reportlab
