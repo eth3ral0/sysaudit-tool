@@ -36,7 +36,6 @@ def main():
         pdf_file = report_gen.generate_pdf()
         excel_file = report_gen.generate_excel()
         logger.log("Rapports generes: {}, {}".format(pdf_file, excel_file))
-        
         print("=" * 60)
         print("Audit termine !")
         print(f"  - PDF: {pdf_file}")

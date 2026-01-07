@@ -1,12 +1,12 @@
+import os
+from datetime import datetime
 from reportlab.lib.pagesizes import letter, A4
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.units import inch
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
 from reportlab.lib import colors
 from openpyxl import Workbook
-from openpyxl.styles import Font, PatternFill
-from datetime import datetime
-import os 
+from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
 
 class ReportGenerator:
     """Génère les rapports (PDF, Excel)"""
@@ -84,7 +84,7 @@ class ReportGenerator:
                 ("GRID", (0, 0), (-1, -1), 1, colors.black),
             ]))
             elements.append(table)
-        
+
         summary = self.data.get("health_summary", "")
         if summary:
             elements.append(Spacer(1, 0.2 * inch))
@@ -155,14 +155,59 @@ class ReportGenerator:
         # Auto-adjust columns
         ws.column_dimensions["A"].width = 25
         ws.column_dimensions["B"].width = 25
-        
+
+
+            # Fonction helper pour colorier les cellules selon le %
+        def get_color_fill(percent):
+            """Retourne PatternFill rouge (>90%), orange (70-90%), vert (<70%)"""
+            try:
+                val = float(percent.rstrip('%'))
+                if val > 90:
+                    return PatternFill(start_color="FF0000", end_color="FF0000", fill_type="solid")  # Rouge
+                elif val >= 70:
+                    return PatternFill(start_color="FFC000", end_color="FFC000", fill_type="solid")  # Orange
+                else:
+                    return PatternFill(start_color="00B050", end_color="00B050", fill_type="solid")  # Vert
+            except:
+                return PatternFill()
+
+        # Section disques avec couleurs
+        row += 2
+        ws[f"A{row}"] = "DISQUES"
+        ws[f"A{row}"].font = Font(bold=True, size=12)
+        row += 1
+
+        # En-tête
+        ws[f"A{row}"] = "Partition"
+        ws[f"B{row}"] = "Total (GB)"
+        ws[f"C{row}"] = "Utilise (GB)"
+        ws[f"D{row}"] = "Libre (GB)"
+        ws[f"E{row}"] = "% Utilise"
+        for col in ["A", "B", "C", "D", "E"]:
+            ws[f"{col}{row}"].font = Font(bold=True, color="FFFFFF")
+            ws[f"{col}{row}"].fill = PatternFill(start_color="366092", end_color="366092", fill_type="solid")
+        row += 1
+
+        # Données disques avec formatage des %
+        for d in self.data.get("disk", []):
+            ws[f"A{row}"] = d.get("device", "")
+            ws[f"B{row}"] = f"{d.get('total_gb', 0):.2f}"
+            ws[f"C{row}"] = f"{d.get('used_gb', 0):.2f}"
+            ws[f"D{row}"] = f"{d.get('free_gb', 0):.2f}"
+
+            # Cellule du pourcentage avec couleur
+            percent_str = f"{d.get('percent', 0):.1f}%"
+            ws[f"E{row}"] = percent_str
+            ws[f"E{row}"].fill = get_color_fill(percent_str)
+            ws[f"E{row}"].font = Font(bold=True, color="FFFFFF")  # Texte blanc pour plus de lisibilité
+
+            row += 1
         # Santé du système (si disponible)
         row += 2
         ws[f"A{row}"] = "SYNTHESE ETAT DU POSTE"
         ws[f"A{row}"].font = Font(bold=True)
         row += 1
         ws[f"A{row}"] = self.data.get("health_summary", "")
-
 
         wb.save(filepath)
         print(f"✓ Excel généré: {filepath}")
