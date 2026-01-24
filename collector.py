@@ -4,14 +4,14 @@ import socket
 from datetime import datetime
 
 class SystemCollector:
-    """Collecte les informations système du poste local"""
+    """Collecte les informations systeme du poste local"""
 
     def __init__(self):
         self.hostname = socket.gethostname()
         self.timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
     def get_basic_info(self):
-        """Infos générales du poste"""
+        """Infos generales du poste"""
         return {
             "hostname": self.hostname,
             "os": platform.system(),
@@ -52,12 +52,12 @@ class SystemCollector:
                     "free_gb": round(usage.free / (1024**3), 2),
                     "percent": usage.percent,
                 })
-            except PermissionError:
+            except (PermissionError, SystemError, OSError):
                 pass
         return disks
 
     def get_network_info(self):
-        """Infos réseau (adresses IP, MAC)"""
+        """Infos reseau (adresses IP, MAC)"""
         networks = []
         for iface, addresses in psutil.net_if_addrs().items():
             for addr in addresses:
@@ -70,7 +70,7 @@ class SystemCollector:
 
     def get_installed_software(self):
         """Placeholder pour logiciels installes"""
-        return "Liste des logiciels : fonctionnalite a venir"
+        return "Liste des logiciels - fonctionnalite a venir"
 
     def compute_health_summary(self, data):
         """Analyse rapide de l'etat du poste"""

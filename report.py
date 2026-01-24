@@ -50,7 +50,7 @@ class ReportGenerator:
         elements.append(Paragraph("<b>Processeur</b>", styles["Heading2"]))
         elements.append(Paragraph(f"Cores physiques: {cpu.get('cpu_count_physical')}", styles["Normal"]))
         elements.append(Paragraph(f"Cores logiques: {cpu.get('cpu_count_logical')}", styles["Normal"]))
-        elements.append(Paragraph(f"Fréquence: {cpu.get('cpu_freq_mhz')} MHz", styles["Normal"]))
+        elements.append(Paragraph(f"Frequence: {cpu.get('cpu_freq_mhz')} MHz", styles["Normal"]))
         elements.append(Spacer(1, 0.2 * inch))
 
         # Memoire
@@ -64,7 +64,7 @@ class ReportGenerator:
         disks = self.data.get("disk", [])
         if disks:
             elements.append(Paragraph("<b>Disques</b>", styles["Heading2"]))
-            disk_data = [["Disque", "Total (GB)", "Utilisé (GB)", "% Utilisé"]]
+            disk_data = [["Disque", "Total (GB)", "Utilise (GB)", "% Utilise"]]
             for disk in disks:
                 disk_data.append([
                     disk["device"],
@@ -177,7 +177,7 @@ class ReportGenerator:
         ws[f"A{row}"].font = Font(bold=True, size=12)
         row += 1
 
-        # En-tête
+        # En-tete
         ws[f"A{row}"] = "Partition"
         ws[f"B{row}"] = "Total (GB)"
         ws[f"C{row}"] = "Utilise (GB)"
@@ -188,7 +188,7 @@ class ReportGenerator:
             ws[f"{col}{row}"].fill = PatternFill(start_color="366092", end_color="366092", fill_type="solid")
         row += 1
 
-        # Données disques avec formatage des %
+        # Donnees disques avec formatage des %
         for d in self.data.get("disk", []):
             ws[f"A{row}"] = d.get("device", "")
             ws[f"B{row}"] = f"{d.get('total_gb', 0):.2f}"
@@ -199,10 +199,10 @@ class ReportGenerator:
             percent_str = f"{d.get('percent', 0):.1f}%"
             ws[f"E{row}"] = percent_str
             ws[f"E{row}"].fill = get_color_fill(percent_str)
-            ws[f"E{row}"].font = Font(bold=True, color="FFFFFF")  # Texte blanc pour plus de lisibilité
+            ws[f"E{row}"].font = Font(bold=True, color="FFFFFF")  # Texte blanc pour plus de lisibilite
 
             row += 1
-        # Santé du système (si disponible)
+        # Sante du systeme (si disponible)
         row += 2
         ws[f"A{row}"] = "SYNTHESE ETAT DU POSTE"
         ws[f"A{row}"].font = Font(bold=True)
