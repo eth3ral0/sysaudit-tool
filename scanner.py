@@ -3,7 +3,7 @@ import ipaddress
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 class NetworkScanner:
-    """Scanne les postes disponibles sur un réseau"""
+    """Scanne les postes disponibles sur un reseau"""
 
     def __init__(self, network_range):
         """
@@ -24,7 +24,7 @@ class NetworkScanner:
             return {"ip": str(ip), "status": "UNREACHABLE"}
 
     def scan_network(self, max_workers=10):
-        """Scanne tout le réseau en parallèle"""
+        """Scanne tout le reseau en parallele"""
         try:
             network = ipaddress.ip_network(self.network_range, strict=False)
             ips = list(network.hosts())
@@ -38,9 +38,9 @@ class NetworkScanner:
                     result = future.result()
                     if result["status"] == "UP":
                         results.append(result)
-                        print(f"  ✓ {result['ip']} is UP")
+                        print(f"  OK {result['ip']} is UP")
 
             return sorted(results, key=lambda x: x["ip"])
         except Exception as e:
-            print(f"Erreur scan réseau: {e}")
+            print(f"Erreur scan reseau: {e}")
             return []

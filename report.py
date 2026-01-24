@@ -9,7 +9,7 @@ from openpyxl import Workbook
 from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
 
 class ReportGenerator:
-    """Génère les rapports (PDF, Excel)"""
+    """Genere les rapports (PDF, Excel)"""
 
     def __init__(self, data):
         self.data = data
@@ -18,7 +18,7 @@ class ReportGenerator:
         os.makedirs(self.output_dir, exist_ok=True)
 
     def generate_pdf(self, filename=None):
-        """Génère un PDF du rapport"""
+        """Genere un PDF du rapport"""
         if not filename:
             filename = f"audit_it_{self.timestamp}.pdf"
         filepath = os.path.join(self.output_dir, filename)
@@ -48,16 +48,16 @@ class ReportGenerator:
         # CPU
         cpu = self.data.get("cpu", {})
         elements.append(Paragraph("<b>Processeur</b>", styles["Heading2"]))
-        elements.append(Paragraph(f"Cœurs physiques: {cpu.get('cpu_count_physical')}", styles["Normal"]))
-        elements.append(Paragraph(f"Cœurs logiques: {cpu.get('cpu_count_logical')}", styles["Normal"]))
+        elements.append(Paragraph(f"Cores physiques: {cpu.get('cpu_count_physical')}", styles["Normal"]))
+        elements.append(Paragraph(f"Cores logiques: {cpu.get('cpu_count_logical')}", styles["Normal"]))
         elements.append(Paragraph(f"Fréquence: {cpu.get('cpu_freq_mhz')} MHz", styles["Normal"]))
         elements.append(Spacer(1, 0.2 * inch))
 
-        # Mémoire
+        # Memoire
         mem = self.data.get("memory", {})
-        elements.append(Paragraph("<b>Mémoire</b>", styles["Heading2"]))
+        elements.append(Paragraph("<b>Memoire</b>", styles["Heading2"]))
         elements.append(Paragraph(f"Total: {mem.get('memory_total_gb')} GB", styles["Normal"]))
-        elements.append(Paragraph(f"Utilisée: {mem.get('memory_used_gb')} GB ({mem.get('memory_percent')}%)", styles["Normal"]))
+        elements.append(Paragraph(f"Utilisee: {mem.get('memory_used_gb')} GB ({mem.get('memory_percent')}%)", styles["Normal"]))
         elements.append(Spacer(1, 0.2 * inch))
 
         # Disques
@@ -93,11 +93,11 @@ class ReportGenerator:
 
 
         doc.build(elements)
-        print(f"✓ PDF généré: {filepath}")
+        print(f"PDF genere: {filepath}")
         return filepath
 
     def generate_excel(self, filename=None):
-        """Génère un Excel du rapport"""
+        """Genere un Excel du rapport"""
         if not filename:
             filename = f"audit_it_{self.timestamp}.xlsx"
         filepath = os.path.join(self.output_dir, filename)
@@ -131,25 +131,25 @@ class ReportGenerator:
         ws[f"A{row}"] = "PROCESSEUR"
         ws[f"A{row}"].font = Font(bold=True)
         row += 1
-        ws[f"A{row}"] = "Cœurs physiques"
+        ws[f"A{row}"] = "Cores physiques"
         ws[f"B{row}"] = cpu.get("cpu_count_physical")
         row += 1
-        ws[f"A{row}"] = "Cœurs logiques"
+        ws[f"A{row}"] = "Cores logiques"
         ws[f"B{row}"] = cpu.get("cpu_count_logical")
         row += 2
 
-        # Mémoire
+        # Memoire
         mem = self.data.get("memory", {})
-        ws[f"A{row}"] = "MÉMOIRE"
+        ws[f"A{row}"] = "MEMOIRE"
         ws[f"A{row}"].font = Font(bold=True)
         row += 1
         ws[f"A{row}"] = "Total (GB)"
         ws[f"B{row}"] = mem.get("memory_total_gb")
         row += 1
-        ws[f"A{row}"] = "Utilisée (GB)"
+        ws[f"A{row}"] = "Utilisee (GB)"
         ws[f"B{row}"] = mem.get("memory_used_gb")
         row += 1
-        ws[f"A{row}"] = "% Utilisé"
+        ws[f"A{row}"] = "% Utilise"
         ws[f"B{row}"] = mem.get("memory_percent")
 
         # Auto-adjust columns
@@ -210,5 +210,5 @@ class ReportGenerator:
         ws[f"A{row}"] = self.data.get("health_summary", "")
 
         wb.save(filepath)
-        print(f"✓ Excel généré: {filepath}")
+        print(f"Excel genere: {filepath}")
         return filepath
