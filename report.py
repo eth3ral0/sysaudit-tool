@@ -51,6 +51,7 @@ class ReportGenerator:
         elements.append(Paragraph(f"Cores physiques: {cpu.get('cpu_count_physical')}", styles["Normal"]))
         elements.append(Paragraph(f"Cores logiques: {cpu.get('cpu_count_logical')}", styles["Normal"]))
         elements.append(Paragraph(f"Frequence: {cpu.get('cpu_freq_mhz')} MHz", styles["Normal"]))
+        elements.append(Paragraph(f"Utilisation: {cpu.get('cpu_percent')}%", styles["Normal"]))
         elements.append(Spacer(1, 0.2 * inch))
 
         # Memoire
@@ -89,7 +90,7 @@ class ReportGenerator:
         network_hosts = self.data.get("network_hosts", [])
         if network_hosts:
             elements.append(Spacer(1, 0.2 * inch))
-            elements.append(Paragraph("**Hotes reseau detectes**", styles["Heading2"]))
+            elements.append(Paragraph("<b>Hotes reseau detectes</b>", styles["Heading2"]))
             for host in network_hosts:
                 ip = host.get('ip', 'N/A')
                 status = host.get('status', 'N/A')
