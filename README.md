@@ -1,4 +1,4 @@
-# sysaudit-tool — outil d'audit système et réseau
+# sysaudit-tool : outil d'audit système et réseau
 
 ![image](https://github.com/eth3ral0/sysaudit-tool/blob/main/banner.png)
 
