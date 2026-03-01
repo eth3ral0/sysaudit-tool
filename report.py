@@ -85,6 +85,17 @@ class ReportGenerator:
             ]))
             elements.append(table)
 
+                # Hotes reseau (si disponible)
+        network_hosts = self.data.get("network_hosts", [])
+        if network_hosts:
+            elements.append(Spacer(1, 0.2 * inch))
+            elements.append(Paragraph("**Hotes reseau detectes**", styles["Heading2"]))
+            for host in network_hosts:
+                ip = host.get('ip', 'N/A')
+                status = host.get('status', 'N/A')
+                elements.append(Paragraph(f"- {ip} ({status})", styles["Normal"]))
+
+
         summary = self.data.get("health_summary", "")
         if summary:
             elements.append(Spacer(1, 0.2 * inch))
@@ -200,6 +211,21 @@ class ReportGenerator:
             ws[f"E{row}"] = percent_str
             ws[f"E{row}"].fill = get_color_fill(percent_str)
             ws[f"E{row}"].font = Font(bold=True, color="FFFFFF")  # Texte blanc pour plus de lisibilite
+
+
+                    # Hotes reseau (si disponible)
+        network_hosts = self.data.get("network_hosts", [])
+        if network_hosts:
+            row += 2
+            ws[f"A{row}"] = "HOTES RESEAU DETECTES"
+            ws[f"A{row}"].font = Font(bold=True)
+            row += 1
+            for host in network_hosts:
+                ip = host.get('ip', 'N/A')
+                status = host.get('status', 'N/A')
+                ws[f"A{row}"] = f"{ip}"
+                ws[f"B{row}"] = f"{status}"
+                row += 1
 
             row += 1
         # Sante du systeme (si disponible)
