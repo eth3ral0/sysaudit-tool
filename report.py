@@ -1,12 +1,12 @@
 import os
 from datetime import datetime
-from reportlab.lib.pagesizes import letter, A4
+from reportlab.lib.pagesizes import A4
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.units import inch
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
 from reportlab.lib import colors
 from openpyxl import Workbook
-from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
+from openpyxl.styles import Font, PatternFill
 
 class ReportGenerator:
     """Genere les rapports (PDF, Excel)"""
@@ -118,9 +118,6 @@ class ReportGenerator:
         ws = wb.active
         ws.title = "Audit IT"
 
-        # Header
-        header_fill = PatternFill(start_color="1F2121", end_color="1F2121", fill_type="solid")
-        header_font = Font(bold=True, color="FFFFFF")
 
         ws["A1"] = "AUDIT INFORMATIQUE"
         ws["A1"].font = Font(bold=True, size=14)

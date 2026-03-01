@@ -1,5 +1,4 @@
 from collector import SystemCollector
-import logger
 from scanner import NetworkScanner
 from report import ReportGenerator
 from logger import SimpleLogger
