@@ -1,4 +1,5 @@
-import ping3
+import subprocess
+import platform
 import ipaddress
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
@@ -13,11 +14,19 @@ class NetworkScanner:
         self.available_hosts = []
 
     def ping_host(self, ip):
-        """Ping un seul host"""
+        """Ping un seul host avec subprocess"""
         try:
-            response = ping3.ping(str(ip), timeout=2)
-            if response:
-                return {"ip": str(ip), "status": "UP", "response_time": response}
+            # Detecter l'OS pour adapter la commande ping
+            param = "-n" if platform.system().lower() == "windows" else "-c"
+            # -n 1 ou -c 1 = 1 seul paquet, -W 2 ou -w 2000 = timeout 2 secondes
+            timeout_param = "-w" if platform.system().lower() == "windows" else "-W"
+            timeout_value = "2000" if platform.system().lower() == "windows" else "2"
+            
+            command = ["ping", param, "1", timeout_param, timeout_value, str(ip)]
+            result = subprocess.run(command, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            
+            if result.returncode == 0:
+                return {"ip": str(ip), "status": "UP"}
             else:
                 return {"ip": str(ip), "status": "DOWN"}
         except Exception:
