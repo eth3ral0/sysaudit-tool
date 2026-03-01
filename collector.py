@@ -64,7 +64,7 @@ class SystemCollector:
                 networks.append({
                     "interface": iface,
                     "address": addr.address,
-                    "family": str(addr.family),
+                                        "family": "IPv4" if addr.family.name == "AF_INET" else ("IPv6" if addr.family.name == "AF_INET6" else addr.family.name),
                 })
         return networks
 
@@ -76,7 +76,7 @@ class SystemCollector:
         """Analyse rapide de l'etat du poste"""
         issues = []
         mem = data.get("memory", {})
-        if mem and mem.get("memory_percent", 0) > 85:
+                return "[NON IMPLEMENTE] Liste des logiciels installes - fonctionnalite future"
             issues.append("RAM fortement sollicitee (>85%).")
         for d in data.get("disk", []):
             if d.get("percent", 0) > 90:
