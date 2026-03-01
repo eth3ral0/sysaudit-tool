@@ -1,8 +1,7 @@
-import psutil
 import platform
 import socket
 from datetime import datetime
-
+import psutil
 class SystemCollector:
     """Collecte les informations systeme du poste local"""
 
@@ -75,20 +74,31 @@ class SystemCollector:
     def compute_health_summary(self, data):
         """Analyse rapide de l'etat du poste"""
         summary = []
-        mem_percent = data.get("memory", {}).get("memory_percent", 0)
+        # CPU
         cpu = data.get("cpu", {})
-        issues = []
-        if cpu and cpu.get("cpu_percent", 0) > 90:
-            issues.append("CPU fortement sollicite (>90%).")
-        if mem_percent > 80:
-            summary.append(f"RAM a {mem_percent}% - possible manque de memoire")
-        else:
-            summary.append(f"RAM a {mem_percent}% - utilisation normale")
-        if issues:
-            summary.append(f"Issues detectees: {', '.join(issues)}")
-        return " | ".join(summary)
+        cpu_percent = cpu.get("cpu_percent", 0) if cpu else 0
+        if cpu_percent > 90:
+            summary.append(f"CPU a {cpu_percent}% - fortement sollicite")
+        elif cpu_percent > 0:
+            summary.append(f"CPU a {cpu_percent}% - normal")
+        # RAM
+        mem = data.get("memory", {})
+        mem_percent = mem.get("memory_percent", 0) if mem else 0
+        if mem_percent > 85:
+            summary.append(f"RAM a {mem_percent}% - risque de saturation")
+        elif mem_percent > 0:
+            summary.append(f"RAM a {mem_percent}% - normal")
+        # Disques
+        for d in data.get("disk", []):
+            disk_percent = d.get("percent", 0)
+            device = d.get("device", "inconnu")
+            if disk_percent > 90:
+                summary.append(f"Disque {device} a {disk_percent}% - presque plein")
+        return " | ".join(summary) if summary else "Aucune information disponible"
+
 
     def collect_all(self):
+        """Collecte toutes les informations et retourne un dictionnaire complet"""
         data = {
             "basic": self.get_basic_info(),
             "cpu": self.get_cpu_info(),
