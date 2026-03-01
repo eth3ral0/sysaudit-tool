@@ -74,16 +74,19 @@ class SystemCollector:
 
     def compute_health_summary(self, data):
         """Analyse rapide de l'etat du poste"""
+        summary = []
+        mem_percent = data.get("memory", {}).get("memory_percent", 0)
+        cpu = data.get("cpu", {})
         issues = []
-        mem = data.get("memory", {})
-                return "[NON IMPLEMENTE] Liste des logiciels installes - fonctionnalite future"
-            issues.append("RAM fortement sollicitee (>85%).")
-        for d in data.get("disk", []):
-            if d.get("percent", 0) > 90:
-                issues.append(f"Disque {d.get('device')} presque plein (>90%).")
-        if not issues:
-            return "Aucun probleme majeur detecte."
-        return " / ".join(issues)
+        if cpu and cpu.get("cpu_percent", 0) > 90:
+            issues.append("CPU fortement sollicite (>90%).")
+        if mem_percent > 80:
+            summary.append(f"RAM a {mem_percent}% - possible manque de memoire")
+        else:
+            summary.append(f"RAM a {mem_percent}% - utilisation normale")
+        if issues:
+            summary.append(f"Issues detectees: {', '.join(issues)}")
+        return " | ".join(summary)
 
     def collect_all(self):
         data = {
